@@ -3,49 +3,34 @@
 namespace App\Http\Controllers\Branch\HRM;
 
 use App\Http\Controllers\Controller;
+use App\Traits\ExportsCsv;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ExportImportController extends Controller
 {
+    use ExportsCsv;
+
     public function exportEmployees(Request $request): StreamedResponse
     {
-        $model = '\\App\\Models\\HREmployee';
+        $query = \App\Models\HREmployee::query()->with(['branch', 'user']);
 
-        if (!class_exists($model)) {
-            abort(500, 'HREmployee model not found');
-        }
-
-        $query = $model::query()->with(['branch', 'user']);
-
-        $filename = 'hrm_employees_' . now()->format('Ymd_His') . '.csv';
-
-        $callback = function () use ($query) {
-            $handle = fopen('php://output', 'w');
-            fputcsv($handle, ['ID', 'Code', 'Name', 'Position', 'Salary', 'Active', 'Branch', 'User email']);
-
-            $query->chunk(500, function ($rows) use ($handle) {
-                foreach ($rows as $row) {
-                    fputcsv($handle, [
-                        $row->id,
-                        $row->code,
-                        $row->name,
-                        $row->position,
-                        $row->salary,
-                        $row->is_active ? '1' : '0',
-                        optional($row->branch)->name ?? '',
-                        optional($row->user)->email ?? '',
-                    ]);
-                }
-            });
-
-            fclose($handle);
-        };
-
-        return response()->streamDownload($callback, $filename, [
-            'Content-Type' => 'text/csv',
-        ]);
+        return $this->exportToCsv(
+            $query,
+            ['ID', 'Code', 'Name', 'Position', 'Salary', 'Active', 'Branch', 'User email'],
+            fn ($row) => [
+                $row->id,
+                $row->code,
+                $row->name,
+                $row->position,
+                $row->salary,
+                $row->is_active ? '1' : '0',
+                $row->branch?->name ?? '',
+                $row->user?->email ?? '',
+            ],
+            'hrm_employees'
+        );
     }
 
     public function importEmployees(Request $request)
@@ -62,7 +47,7 @@ class ExportImportController extends Controller
 
         $model = '\\App\\Models\\HREmployee';
 
-        if (!class_exists($model)) {
+        if (! class_exists($model)) {
             abort(500, 'HREmployee model not found');
         }
 
@@ -92,4 +77,3 @@ class ExportImportController extends Controller
         return back()->with('status', 'Employees imported successfully');
     }
 }
-
