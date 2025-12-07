@@ -3,37 +3,14 @@
 namespace App\Http\Controllers\Branch\Rental;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Database\Eloquent\Builder;
+use App\Traits\ExportsCsv;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ExportImportController extends Controller
 {
-    /**
-     * Generic method to export data to CSV
-     */
-    private function exportToCsv(Builder $query, array $headers, callable $rowMapper, string $filenamePrefix): StreamedResponse
-    {
-        $filename = $filenamePrefix.'_'.now()->format('Ymd_His').'.csv';
-
-        $callback = function () use ($query, $headers, $rowMapper) {
-            $handle = fopen('php://output', 'w');
-            fputcsv($handle, $headers);
-
-            $query->chunk(500, function ($rows) use ($handle, $rowMapper) {
-                foreach ($rows as $row) {
-                    fputcsv($handle, $rowMapper($row));
-                }
-            });
-
-            fclose($handle);
-        };
-
-        return response()->streamDownload($callback, $filename, [
-            'Content-Type' => 'text/csv',
-        ]);
-    }
+    use ExportsCsv;
 
     public function exportUnits(Request $request): StreamedResponse
     {
