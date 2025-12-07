@@ -89,58 +89,79 @@ return new class extends Migration
      * Reverse the migrations.
      *
      * Removes all indexes added by the up() method.
+     * Uses try-catch to handle cases where indexes may not exist.
      */
     public function down(): void
     {
-        Schema::table('sales', function (Blueprint $table) {
-            $table->dropIndex('sales_status_idx');
-            $table->dropIndex('sales_posted_at_idx');
-            $table->dropIndex('sales_cust_created_idx');
-        });
+        $this->safeDropIndexes('sales', [
+            'sales_status_idx',
+            'sales_posted_at_idx',
+            'sales_cust_created_idx',
+        ]);
 
-        Schema::table('sale_items', function (Blueprint $table) {
-            $table->dropIndex('sale_items_sale_prod_idx');
-            $table->dropIndex('sale_items_product_idx');
-        });
+        $this->safeDropIndexes('sale_items', [
+            'sale_items_sale_prod_idx',
+            'sale_items_product_idx',
+        ]);
 
-        Schema::table('purchases', function (Blueprint $table) {
-            $table->dropIndex('purchases_status_idx');
-            $table->dropIndex('purchases_posted_at_idx');
-            $table->dropIndex('purchases_supp_created_idx');
-        });
+        $this->safeDropIndexes('purchases', [
+            'purchases_status_idx',
+            'purchases_posted_at_idx',
+            'purchases_supp_created_idx',
+        ]);
 
-        Schema::table('purchase_items', function (Blueprint $table) {
-            $table->dropIndex('purchase_items_purch_prod_idx');
-            $table->dropIndex('purchase_items_product_idx');
-        });
+        $this->safeDropIndexes('purchase_items', [
+            'purchase_items_purch_prod_idx',
+            'purchase_items_product_idx',
+        ]);
 
-        Schema::table('stock_movements', function (Blueprint $table) {
-            $table->dropIndex('stock_mv_prod_br_date_idx');
-            $table->dropIndex('stock_mv_wh_date_idx');
-        });
+        $this->safeDropIndexes('stock_movements', [
+            'stock_mv_prod_br_date_idx',
+            'stock_mv_wh_date_idx',
+        ]);
 
-        Schema::table('audit_logs', function (Blueprint $table) {
-            $table->dropIndex('audit_logs_auditable_idx');
-            $table->dropIndex('audit_logs_user_date_idx');
-            $table->dropIndex('audit_logs_event_idx');
-        });
+        $this->safeDropIndexes('audit_logs', [
+            'audit_logs_auditable_idx',
+            'audit_logs_user_date_idx',
+            'audit_logs_event_idx',
+        ]);
 
-        Schema::table('products', function (Blueprint $table) {
-            $table->dropIndex('products_sku_idx');
-            $table->dropIndex('products_barcode_idx');
-            $table->dropIndex('products_br_type_idx');
-        });
+        $this->safeDropIndexes('products', [
+            'products_sku_idx',
+            'products_barcode_idx',
+            'products_br_type_idx',
+        ]);
 
-        Schema::table('customers', function (Blueprint $table) {
-            $table->dropIndex('customers_email_idx');
-            $table->dropIndex('customers_phone_idx');
-            $table->dropIndex('customers_br_status_idx');
-        });
+        $this->safeDropIndexes('customers', [
+            'customers_email_idx',
+            'customers_phone_idx',
+            'customers_br_status_idx',
+        ]);
 
-        Schema::table('suppliers', function (Blueprint $table) {
-            $table->dropIndex('suppliers_email_idx');
-            $table->dropIndex('suppliers_phone_idx');
-            $table->dropIndex('suppliers_br_status_idx');
+        $this->safeDropIndexes('suppliers', [
+            'suppliers_email_idx',
+            'suppliers_phone_idx',
+            'suppliers_br_status_idx',
+        ]);
+    }
+
+    /**
+     * Safely drop indexes from a table, catching exceptions if indexes don't exist.
+     *
+     * @param  string  $table  The table name
+     * @param  array<string>  $indexes  Array of index names to drop
+     */
+    private function safeDropIndexes(string $table, array $indexes): void
+    {
+        Schema::table($table, function (Blueprint $tableBlueprint) use ($indexes) {
+            foreach ($indexes as $index) {
+                try {
+                    $tableBlueprint->dropIndex($index);
+                } catch (\Exception $e) {
+                    // Index doesn't exist, continue with next index
+                    // This prevents migration rollback failures
+                }
+            }
         });
     }
 };
