@@ -161,13 +161,15 @@ class ChartOfAccountsSeeder extends Seeder
             'is_active' => true,
         ]);
 
-        Account::create([
+        // Tax Recoverable is an asset (receivable from government)
+        $taxRecoverable = Account::create([
             'branch_id' => $branchId,
-            'account_number' => '2210',
+            'account_number' => '1150',
             'name' => 'Tax Recoverable',
             'name_ar' => 'الضرائب القابلة للاسترداد',
             'type' => 'asset',
             'account_category' => 'current',
+            'parent_id' => $currentAssets->id,
             'is_system_account' => true,
             'is_active' => true,
         ]);
@@ -412,7 +414,7 @@ class ChartOfAccountsSeeder extends Seeder
             'branch_id' => $branchId,
             'module_name' => 'purchases',
             'mapping_key' => 'tax_recoverable',
-            'account_id' => Account::where('account_number', '2210')->first()->id,
+            'account_id' => Account::where('account_number', '1150')->first()->id,
             'is_active' => true,
         ]);
 

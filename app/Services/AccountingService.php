@@ -126,7 +126,7 @@ class AccountingService
      */
     public function generatePurchaseJournalEntry(Purchase $purchase): JournalEntry
     {
-        if ($purchase->journal_entry_id ?? false) {
+        if (!empty($purchase->journal_entry_id)) {
             throw new Exception('Journal entry already generated for this purchase');
         }
 

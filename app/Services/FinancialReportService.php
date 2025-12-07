@@ -275,7 +275,9 @@ class FinancialReportService
         $aging = [];
 
         foreach ($sales as $sale) {
-            $daysOverdue = now()->diffInDays($sale->sale_date);
+            // Calculate days from sale date (or due date if available)
+            $referenceDate = $sale->due_date ?? $sale->sale_date;
+            $daysOverdue = now()->diffInDays($referenceDate, false);
             $outstandingAmount = $sale->grand_total - ($sale->paid_amount ?? 0);
 
             if ($outstandingAmount <= 0) {
@@ -328,7 +330,9 @@ class FinancialReportService
         $aging = [];
 
         foreach ($purchases as $purchase) {
-            $daysOverdue = now()->diffInDays($purchase->purchase_date);
+            // Calculate days from purchase date (or due date if available)
+            $referenceDate = $purchase->due_date ?? $purchase->purchase_date;
+            $daysOverdue = now()->diffInDays($referenceDate, false);
             $outstandingAmount = $purchase->grand_total - ($purchase->paid_amount ?? 0);
 
             if ($outstandingAmount <= 0) {
@@ -466,13 +470,13 @@ class FinancialReportService
      */
     protected function getAgingBucket(int $daysOverdue): string
     {
-        if ($daysOverdue <= 30) {
+        if ($daysOverdue <= 0) {
             return 'current';
-        } elseif ($daysOverdue <= 60) {
+        } elseif ($daysOverdue <= 30) {
             return '1_30_days';
-        } elseif ($daysOverdue <= 90) {
+        } elseif ($daysOverdue <= 60) {
             return '31_60_days';
-        } elseif ($daysOverdue <= 120) {
+        } elseif ($daysOverdue <= 90) {
             return '61_90_days';
         } else {
             return 'over_90_days';

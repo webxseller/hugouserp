@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::table('accounts', function (Blueprint $table) {
             $table->string('currency_code', 3)->nullable()->after('type');
             $table->boolean('requires_currency')->default(false)->after('currency_code');
-            $table->string('account_category')->nullable()->after('type')->comment('asset, liability, equity, revenue, expense');
+            $table->string('account_category')->nullable()->after('type')->comment('current, fixed, long-term, etc.');
             $table->string('sub_category')->nullable()->after('account_category')->comment('current, fixed, etc.');
             $table->boolean('is_system_account')->default(false)->after('is_active');
             $table->json('metadata')->nullable()->after('description');

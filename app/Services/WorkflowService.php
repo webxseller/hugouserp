@@ -127,7 +127,7 @@ class WorkflowService
             'stage_order' => $stage['order'],
             'approver_id' => $approverId,
             'approver_role' => $approverRole,
-            'status' => $stage['order'] === 1 ? 'pending' : 'pending',
+            'status' => 'pending',
             'requested_at' => now(),
         ]);
     }

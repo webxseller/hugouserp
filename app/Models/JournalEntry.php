@@ -58,9 +58,15 @@ class JournalEntry extends Model
         return $this->belongsTo(JournalEntry::class, 'reversed_by_entry_id');
     }
 
-    public function fiscalPeriod(): BelongsTo
+    /**
+     * Get fiscal period (composite key not directly supported, use helper)
+     */
+    public function fiscalPeriod()
     {
-        return $this->belongsTo(FiscalPeriod::class, ['fiscal_year', 'fiscal_period'], ['year', 'period']);
+        return FiscalPeriod::where('year', $this->fiscal_year)
+            ->where('period', $this->fiscal_period)
+            ->where('branch_id', $this->branch_id)
+            ->first();
     }
 
     public function lines(): HasMany
