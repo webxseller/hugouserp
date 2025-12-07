@@ -13,6 +13,8 @@ class ModuleNavigation extends Model
 {
     use HasFactory;
 
+    protected $table = 'module_navigation';
+
     protected $fillable = [
         'module_id',
         'parent_id',
