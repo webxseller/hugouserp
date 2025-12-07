@@ -16,6 +16,21 @@
  * @returns {Object} Alpine.js component data object
  */
 
+// Configuration Constants
+const CONFIG = {
+    /** Maximum allowed quantity per cart item */
+    MAX_QUANTITY: 999999,
+    
+    /** Maximum allowed price per item */
+    MAX_PRICE: 9999999.99,
+    
+    /** Timeout for product search requests (milliseconds) */
+    SEARCH_TIMEOUT: 10000,
+    
+    /** Timeout for checkout requests (milliseconds) */
+    CHECKOUT_TIMEOUT: 15000,
+};
+
 export function erpPosTerminal(options) {
     const branchId = options.branchId;
 
@@ -206,7 +221,7 @@ export function erpPosTerminal(options) {
             try {
                 const response = await window.axios.get(`/api/v1/branches/${this.branchId}/products/search`, {
                     params: { q: this.search },
-                    timeout: 10000, // 10 second timeout
+                    timeout: CONFIG.SEARCH_TIMEOUT,
                 });
 
                 let data = response.data;
@@ -301,14 +316,14 @@ export function erpPosTerminal(options) {
             // Parse and validate quantity
             const value = Number(qty ?? 0);
             
-            // Ensure positive quantity, minimum 0.01, maximum 999999
+            // Ensure positive quantity, minimum 0.01, maximum CONFIG.MAX_QUANTITY
             if (isNaN(value) || value <= 0) {
                 this.cart[index].qty = 1;
-            } else if (value > 999999) {
-                this.cart[index].qty = 999999;
+            } else if (value > CONFIG.MAX_QUANTITY) {
+                this.cart[index].qty = CONFIG.MAX_QUANTITY;
                 this.message = {
                     type: 'warning',
-                    text: 'الكمية القصوى المسموح بها هي 999999.',
+                    text: `الكمية القصوى المسموح بها هي ${CONFIG.MAX_QUANTITY}.`,
                 };
             } else {
                 this.cart[index].qty = value;
@@ -325,14 +340,14 @@ export function erpPosTerminal(options) {
             // Parse and validate price
             const value = Number(price ?? 0);
             
-            // Ensure non-negative price, maximum 9999999.99
+            // Ensure non-negative price, maximum CONFIG.MAX_PRICE
             if (isNaN(value) || value < 0) {
                 this.cart[index].price = 0;
-            } else if (value > 9999999.99) {
-                this.cart[index].price = 9999999.99;
+            } else if (value > CONFIG.MAX_PRICE) {
+                this.cart[index].price = CONFIG.MAX_PRICE;
                 this.message = {
                     type: 'warning',
-                    text: 'السعر القصوى المسموح به هو 9999999.99.',
+                    text: `السعر القصوى المسموح به هو ${CONFIG.MAX_PRICE}.`,
                 };
             } else {
                 // Round to 2 decimal places
@@ -408,7 +423,7 @@ export function erpPosTerminal(options) {
 
             try {
                 const response = await window.axios.post(`/api/v1/branches/${this.branchId}/pos/checkout`, payload, {
-                    timeout: 15000, // 15 second timeout for checkout
+                    timeout: CONFIG.CHECKOUT_TIMEOUT,
                 });
 
                 // Extract message from standardized API response
