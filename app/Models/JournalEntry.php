@@ -18,11 +18,24 @@ class JournalEntry extends Model
         'entry_date',
         'description',
         'status',
+        'source_module',
+        'source_type',
+        'source_id',
         'created_by',
+        'approved_by',
+        'approved_at',
+        'fiscal_year',
+        'fiscal_period',
+        'is_auto_generated',
+        'is_reversible',
+        'reversed_by_entry_id',
     ];
 
     protected $casts = [
         'entry_date' => 'date',
+        'approved_at' => 'datetime',
+        'is_auto_generated' => 'boolean',
+        'is_reversible' => 'boolean',
     ];
 
     public function branch(): BelongsTo
@@ -33,6 +46,27 @@ class JournalEntry extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function approver(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    public function reversedByEntry(): BelongsTo
+    {
+        return $this->belongsTo(JournalEntry::class, 'reversed_by_entry_id');
+    }
+
+    /**
+     * Get fiscal period (composite key not directly supported, use helper)
+     */
+    public function fiscalPeriod()
+    {
+        return FiscalPeriod::where('year', $this->fiscal_year)
+            ->where('period', $this->fiscal_period)
+            ->where('branch_id', $this->branch_id)
+            ->first();
     }
 
     public function lines(): HasMany
