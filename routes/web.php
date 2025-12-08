@@ -565,6 +565,103 @@ Route::middleware('auth')->group(function () {
                 ->middleware('can:inventory.products.view');
         });
     });
+
+    // Helpdesk Routes
+    Route::prefix('helpdesk')->name('helpdesk.')->group(function () {
+        Route::get('/', \App\Livewire\Helpdesk\Index::class)
+            ->name('index')
+            ->middleware('can:helpdesk.view');
+        
+        Route::get('/dashboard', \App\Livewire\Helpdesk\Dashboard::class)
+            ->name('dashboard')
+            ->middleware('can:helpdesk.view');
+        
+        Route::get('/create', \App\Livewire\Helpdesk\TicketForm::class)
+            ->name('create')
+            ->middleware('can:helpdesk.create');
+        
+        Route::get('/{ticket}', \App\Livewire\Helpdesk\TicketDetail::class)
+            ->name('show')
+            ->middleware('can:helpdesk.view');
+        
+        Route::get('/{ticket}/edit', \App\Livewire\Helpdesk\TicketForm::class)
+            ->name('edit')
+            ->middleware('can:helpdesk.edit');
+        
+        // Categories
+        Route::get('/settings/categories', \App\Livewire\Helpdesk\Categories\Index::class)
+            ->name('categories.index')
+            ->middleware('can:helpdesk.manage');
+        
+        // Priorities
+        Route::get('/settings/priorities', \App\Livewire\Helpdesk\Priorities\Index::class)
+            ->name('priorities.index')
+            ->middleware('can:helpdesk.manage');
+        
+        // SLA Policies
+        Route::get('/settings/sla-policies', \App\Livewire\Helpdesk\SLAPolicies\Index::class)
+            ->name('sla-policies.index')
+            ->middleware('can:helpdesk.manage');
+    });
+
+    // Projects Routes
+    Route::prefix('projects')->name('projects.')->group(function () {
+        Route::get('/', \App\Livewire\Projects\Index::class)
+            ->name('index')
+            ->middleware('can:projects.view');
+        
+        Route::get('/create', \App\Livewire\Projects\Form::class)
+            ->name('create')
+            ->middleware('can:projects.create');
+        
+        Route::get('/{project}', \App\Livewire\Projects\Show::class)
+            ->name('show')
+            ->middleware('can:projects.view');
+        
+        Route::get('/{project}/edit', \App\Livewire\Projects\Form::class)
+            ->name('edit')
+            ->middleware('can:projects.edit');
+        
+        Route::get('/{project}/tasks', \App\Livewire\Projects\Tasks::class)
+            ->name('tasks')
+            ->middleware('can:projects.tasks.view');
+        
+        Route::get('/{project}/time-logs', \App\Livewire\Projects\TimeLogs::class)
+            ->name('time-logs')
+            ->middleware('can:projects.timelogs.view');
+        
+        Route::get('/{project}/expenses', \App\Livewire\Projects\Expenses::class)
+            ->name('expenses')
+            ->middleware('can:projects.expenses.view');
+    });
+
+    // Documents Routes
+    Route::prefix('documents')->name('documents.')->group(function () {
+        Route::get('/', \App\Livewire\Documents\Index::class)
+            ->name('index')
+            ->middleware('can:documents.view');
+        
+        Route::get('/create', \App\Livewire\Documents\Form::class)
+            ->name('create')
+            ->middleware('can:documents.create');
+        
+        Route::get('/{document}', \App\Livewire\Documents\Show::class)
+            ->name('show')
+            ->middleware('can:documents.view');
+        
+        Route::get('/{document}/edit', \App\Livewire\Documents\Form::class)
+            ->name('edit')
+            ->middleware('can:documents.edit');
+        
+        Route::get('/{document}/versions', \App\Livewire\Documents\Versions::class)
+            ->name('versions')
+            ->middleware('can:documents.versions.view');
+        
+        // Tags
+        Route::get('/settings/tags', \App\Livewire\Documents\Tags\Index::class)
+            ->name('tags.index')
+            ->middleware('can:documents.tags.manage');
+    });
 });
 
 // Scheduled reports manager
