@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Livewire\Rentals\Tenants;
+namespace App\Livewire\Rental\Properties;
 
-use App\Models\RentalContract;
-use App\Models\Tenant;
+use App\Models\Property;
+use App\Models\RentalUnit;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
@@ -19,9 +19,6 @@ class Index extends Component
     #[Url]
     public string $search = '';
 
-    #[Url]
-    public string $status = '';
-
     public string $sortField = 'created_at';
 
     public string $sortDirection = 'desc';
@@ -32,13 +29,9 @@ class Index extends Component
 
     public string $name = '';
 
-    public string $email = '';
-
-    public string $phone = '';
-
     public string $address = '';
 
-    public bool $is_active = true;
+    public string $notes = '';
 
     public function updatingSearch(): void
     {
@@ -66,13 +59,11 @@ class Index extends Component
         $this->resetForm();
 
         if ($id) {
-            $tenant = Tenant::findOrFail($id);
+            $property = Property::findOrFail($id);
             $this->editingId = $id;
-            $this->name = $tenant->name;
-            $this->email = $tenant->email ?? '';
-            $this->phone = $tenant->phone ?? '';
-            $this->address = $tenant->address ?? '';
-            $this->is_active = $tenant->is_active;
+            $this->name = $property->name;
+            $this->address = $property->address ?? '';
+            $this->notes = $property->notes ?? '';
         }
 
         $this->showModal = true;
@@ -88,10 +79,8 @@ class Index extends Component
     {
         $this->editingId = null;
         $this->name = '';
-        $this->email = '';
-        $this->phone = '';
         $this->address = '';
-        $this->is_active = true;
+        $this->notes = '';
         $this->resetErrorBag();
     }
 
@@ -105,10 +94,8 @@ class Index extends Component
 
         $validated = $this->validate([
             'name' => 'required|string|max:255',
-            'email' => 'nullable|email|max:255',
-            'phone' => 'nullable|string|max:50',
             'address' => 'nullable|string|max:500',
-            'is_active' => 'boolean',
+            'notes' => 'nullable|string',
         ]);
 
         $user = auth()->user();
@@ -117,14 +104,14 @@ class Index extends Component
         ]);
 
         if ($this->editingId) {
-            Tenant::findOrFail($this->editingId)->update($data);
-            session()->flash('success', __('Tenant updated successfully'));
+            Property::findOrFail($this->editingId)->update($data);
+            session()->flash('success', __('Property updated successfully'));
         } else {
-            Tenant::create($data);
-            session()->flash('success', __('Tenant created successfully'));
+            Property::create($data);
+            session()->flash('success', __('Property created successfully'));
         }
 
-        Cache::forget('tenants_stats_'.($user->branch_id ?? 'all'));
+        Cache::forget('properties_stats_'.($user->branch_id ?? 'all'));
         $this->closeModal();
     }
 
@@ -132,37 +119,36 @@ class Index extends Component
     {
         $this->authorize('rentals.manage');
 
-        Tenant::findOrFail($id)->delete();
-        Cache::forget('tenants_stats_'.(auth()->user()?->branch_id ?? 'all'));
-        session()->flash('success', __('Tenant deleted successfully'));
+        Property::findOrFail($id)->delete();
+        Cache::forget('properties_stats_'.(auth()->user()?->branch_id ?? 'all'));
+        session()->flash('success', __('Property deleted successfully'));
     }
 
     public function getStatistics(): array
     {
         $user = auth()->user();
-        $cacheKey = 'tenants_stats_'.($user?->branch_id ?? 'all');
+        $cacheKey = 'properties_stats_'.($user?->branch_id ?? 'all');
 
         return Cache::remember($cacheKey, 300, function () use ($user) {
-            $tenantQuery = Tenant::query();
+            $propertyQuery = Property::query();
 
             if ($user && $user->branch_id) {
-                $tenantQuery->where('branch_id', $user->branch_id);
+                $propertyQuery->where('branch_id', $user->branch_id);
             }
 
-            $activeContracts = RentalContract::query()
+            $propertyIds = Property::query()
                 ->when($user && $user->branch_id, fn ($q) => $q->where('branch_id', $user->branch_id))
-                ->where('status', 'active')
-                ->count();
+                ->pluck('id');
+
+            $totalUnits = RentalUnit::whereIn('property_id', $propertyIds)->count();
+            $availableUnits = RentalUnit::whereIn('property_id', $propertyIds)->where('status', 'available')->count();
+            $occupiedUnits = RentalUnit::whereIn('property_id', $propertyIds)->where('status', 'occupied')->count();
 
             return [
-                'total_tenants' => $tenantQuery->count(),
-                'active_tenants' => Tenant::query()
-                    ->when($user && $user->branch_id, fn ($q) => $q->where('branch_id', $user->branch_id))
-                    ->where('is_active', true)->count(),
-                'active_contracts' => $activeContracts,
-                'inactive_tenants' => Tenant::query()
-                    ->when($user && $user->branch_id, fn ($q) => $q->where('branch_id', $user->branch_id))
-                    ->where('is_active', false)->count(),
+                'total_properties' => $propertyQuery->count(),
+                'total_units' => $totalUnits,
+                'available_units' => $availableUnits,
+                'occupied_units' => $occupiedUnits,
             ];
         });
     }
@@ -172,23 +158,20 @@ class Index extends Component
     {
         $user = auth()->user();
 
-        $tenants = Tenant::query()
-            ->withCount('contracts')
+        $properties = Property::query()
+            ->withCount('units')
             ->when($user && $user->branch_id, fn ($q) => $q->where('branch_id', $user->branch_id))
             ->when($this->search, fn ($q) => $q->where(function ($query) {
                 $query->where('name', 'like', "%{$this->search}%")
-                    ->orWhere('email', 'like', "%{$this->search}%")
-                    ->orWhere('phone', 'like', "%{$this->search}%");
+                    ->orWhere('address', 'like', "%{$this->search}%");
             }))
-            ->when($this->status === 'active', fn ($q) => $q->where('is_active', true))
-            ->when($this->status === 'inactive', fn ($q) => $q->where('is_active', false))
             ->orderBy($this->sortField, $this->sortDirection)
             ->paginate(15);
 
         $stats = $this->getStatistics();
 
-        return view('livewire.rentals.tenants.index', [
-            'tenants' => $tenants,
+        return view('livewire.rentals.properties.index', [
+            'properties' => $properties,
             'stats' => $stats,
         ]);
     }
