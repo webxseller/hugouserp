@@ -657,6 +657,10 @@ Route::middleware('auth')->group(function () {
             ->name('versions')
             ->middleware('can:documents.versions.view');
         
+        Route::get('/{document}/download', [\App\Http\Controllers\Documents\DownloadController::class, '__invoke'])
+            ->name('download')
+            ->middleware('can:documents.view');
+        
         // Tags
         Route::get('/settings/tags', \App\Livewire\Documents\Tags\Index::class)
             ->name('tags.index')

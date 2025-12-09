@@ -72,7 +72,7 @@ class Document extends Model
 
     public function tags(): BelongsToMany
     {
-        return $this->belongsToMany(DocumentTag::class, 'document_tag_pivot', 'document_id', 'tag_id');
+        return $this->belongsToMany(DocumentTag::class, 'document_tag', 'document_id', 'tag_id');
     }
 
     public function shares(): HasMany

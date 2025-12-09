@@ -65,15 +65,32 @@ class ProjectTimeLog extends Model
         return $this->belongsTo(User::class, 'updated_by');
     }
 
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
     // Scopes
     public function scopeBillable($query)
     {
-        return $query->where('is_billable', true);
+        return $query->where(function ($q) {
+            $q->where('is_billable', true)
+                ->orWhere(function ($nested) {
+                    $nested->whereNull('is_billable')
+                        ->where('billable', true);
+                });
+        });
     }
 
     public function scopeNonBillable($query)
     {
-        return $query->where('is_billable', false);
+        return $query->where(function ($q) {
+            $q->where('is_billable', false)
+                ->orWhere(function ($nested) {
+                    $nested->whereNull('is_billable')
+                        ->where('billable', false);
+                });
+        });
     }
 
     public function scopeForDate($query, $date)
@@ -102,9 +119,10 @@ class ProjectTimeLog extends Model
     {
         // If log_date has a value, return it; otherwise fall back to date
         if ($value !== null) {
-            return $value;
+            return $this->asDateTime($value);
         }
-        return $this->getRawOriginal('date');
+        $rawDate = $this->getRawOriginal('date');
+        return $rawDate ? $this->asDateTime($rawDate) : null;
     }
 
     public function getUserIdAttribute($value)
@@ -114,5 +132,29 @@ class ProjectTimeLog extends Model
             return $value;
         }
         return $this->getRawOriginal('employee_id');
+    }
+
+    public function getIsBillableAttribute($value)
+    {
+        // If is_billable has a value, return it; otherwise fall back to billable with default true
+        if ($value !== null) {
+            return (bool) $value;
+        }
+        $legacyBillable = $this->getRawOriginal('billable');
+        return $legacyBillable !== null ? (bool) $legacyBillable : true;
+    }
+
+    public function setIsBillableAttribute($value): void
+    {
+        $boolValue = (bool) $value;
+        $this->attributes['is_billable'] = $boolValue;
+        $this->attributes['billable'] = $boolValue;
+    }
+
+    public function setBillableAttribute($value): void
+    {
+        $boolValue = (bool) $value;
+        $this->attributes['billable'] = $boolValue;
+        $this->attributes['is_billable'] = $boolValue;
     }
 }
