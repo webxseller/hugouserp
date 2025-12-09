@@ -14,6 +14,14 @@ class CustomersController extends BaseApiController
     {
         $store = $this->getStore($request);
 
+        $validated = $request->validate([
+            'sort_by' => 'sometimes|string|in:created_at,id,name,email',
+            'sort_dir' => 'sometimes|string|in:asc,desc',
+        ]);
+
+        $sortBy = $validated['sort_by'] ?? 'created_at';
+        $sortDir = $validated['sort_dir'] ?? 'desc';
+
         $query = Customer::query()
             ->when($store?->branch_id, fn ($q) => $q->where('branch_id', $store->branch_id))
             ->when($request->filled('search'), function ($q) use ($request) {
@@ -25,7 +33,7 @@ class CustomersController extends BaseApiController
                         ->orWhere('phone', 'like', "%{$search}%");
                 });
             })
-            ->orderBy($request->get('sort_by', 'created_at'), $request->get('sort_dir', 'desc'));
+            ->orderBy($sortBy, $sortDir);
 
         $customers = $query->paginate($request->get('per_page', 50));
 
