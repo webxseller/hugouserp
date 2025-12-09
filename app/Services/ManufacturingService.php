@@ -184,11 +184,11 @@ class ManufacturingService
                     'branch_id' => $order->branch_id,
                     'product_id' => $item->product_id,
                     'warehouse_id' => $order->warehouse_id,
-                    'movement_type' => 'production_out',
-                    'quantity' => -$item->quantity_required,
+                    'direction' => 'out',
+                    'qty' => $item->quantity_required,
                     'reference_type' => ProductionOrder::class,
                     'reference_id' => $order->id,
-                    'notes' => "Material issued for production order {$order->order_number}",
+                    'notes' => "Material issued for production order {$order->order_number} (production_out)",
                     'created_by' => auth()->id(),
                 ]);
 
@@ -222,11 +222,11 @@ class ManufacturingService
                 'branch_id' => $order->branch_id,
                 'product_id' => $order->product_id,
                 'warehouse_id' => $order->warehouse_id,
-                'movement_type' => 'production_in',
-                'quantity' => $quantity,
+                'direction' => 'in',
+                'qty' => $quantity,
                 'reference_type' => ProductionOrder::class,
                 'reference_id' => $order->id,
-                'notes' => "Production output for order {$order->order_number}",
+                'notes' => "Production output for order {$order->order_number} (production_in)",
                 'created_by' => auth()->id(),
             ]);
 
@@ -289,11 +289,11 @@ class ManufacturingService
                         'branch_id' => $order->branch_id,
                         'product_id' => $item->product_id,
                         'warehouse_id' => $order->warehouse_id,
-                        'movement_type' => 'production_return',
-                        'quantity' => $unconsumed,
+                        'direction' => 'in',
+                        'qty' => $unconsumed,
                         'reference_type' => ProductionOrder::class,
                         'reference_id' => $order->id,
-                        'notes' => "Material return from cancelled order: {$reason}",
+                        'notes' => "Material return from cancelled order: {$reason} (production_return)",
                         'created_by' => auth()->id(),
                     ]);
                 }
