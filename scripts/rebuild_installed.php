@@ -52,7 +52,7 @@ if (isset($lockData['packages-dev'])) {
 
 $installedPhp = '<?php return ' . var_export([
     'root' => buildRootPackage($basePath),
-    'versions' => buildVersionsArray(array_merge($lockData['packages'], $lockData['packages-dev'] ?? [])),
+    'versions' => buildVersionsArray(array_merge($lockData['packages'], $lockData['packages-dev'] ?? []), $basePath),
 ], true) . ';' . "\n";
 
 if (file_put_contents($installedFile, $installedPhp) === false) {
@@ -98,7 +98,7 @@ function buildRootPackage(string $basePath): array
     ];
 }
 
-function buildVersionsArray(array $packages): array
+function buildVersionsArray(array $packages, string $basePath): array
 {
     $versions = [];
     
@@ -110,7 +110,7 @@ function buildVersionsArray(array $packages): array
                 'version' => $package['version'] ?? '',
                 'reference' => $package['source']['reference'] ?? null,
                 'type' => $package['type'] ?? 'library',
-                'install_path' => __DIR__ . '/../../' . str_replace('/', '-', $name),
+                'install_path' => $basePath . '/vendor/' . str_replace('/', '-', $name),
                 'aliases' => [],
                 'dev_requirement' => false,
             ];

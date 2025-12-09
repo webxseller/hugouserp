@@ -141,18 +141,16 @@ class Form extends Component
 
         if ($this->isEdit && $this->requisition) {
             $this->requisition->update($data);
-            $requisition = $this->requisition;
-
             // Delete existing items and recreate
-            $requisition->items()->delete();
+            $this->requisition->items()->delete();
         } else {
-            $requisition = PurchaseRequisition::create($data);
+            $this->requisition = PurchaseRequisition::create($data);
         }
 
         // Create items
         foreach ($this->items as $item) {
             PurchaseRequisitionItem::create([
-                'purchase_requisition_id' => $requisition->id,
+                'purchase_requisition_id' => $this->requisition->id,
                 'product_id' => $item['product_id'],
                 'quantity' => $item['quantity'],
                 'estimated_unit_price' => $item['unit_price'],
