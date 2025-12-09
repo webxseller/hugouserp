@@ -188,7 +188,7 @@ class ManufacturingService
                     'qty' => $item->quantity_required,
                     'reference_type' => ProductionOrder::class,
                     'reference_id' => $order->id,
-                    'notes' => "Material issued for production order {$order->order_number} (production_out)",
+                    'notes' => "Material issued for production order {$order->order_number}",
                     'created_by' => auth()->id(),
                 ]);
 
@@ -226,7 +226,7 @@ class ManufacturingService
                 'qty' => $quantity,
                 'reference_type' => ProductionOrder::class,
                 'reference_id' => $order->id,
-                'notes' => "Production output for order {$order->order_number} (production_in)",
+                'notes' => "Production output for order {$order->order_number}",
                 'created_by' => auth()->id(),
             ]);
 
@@ -293,7 +293,7 @@ class ManufacturingService
                         'qty' => $unconsumed,
                         'reference_type' => ProductionOrder::class,
                         'reference_id' => $order->id,
-                        'notes' => "Material return from cancelled order: {$reason} (production_return)",
+                        'notes' => "Material return from cancelled order: {$reason}",
                         'created_by' => auth()->id(),
                     ]);
                 }
