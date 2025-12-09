@@ -15,10 +15,14 @@ return new class extends Migration
     public function up(): void
     {
         // 1. Documents table - Add version and is_public columns
-        if (Schema::hasTable('documents') && !Schema::hasColumn('documents', 'version')) {
+        if (Schema::hasTable('documents')) {
             Schema::table('documents', function (Blueprint $table) {
-                $table->integer('version')->default(1)->after('mime_type');
-                $table->boolean('is_public')->default(false)->after('version');
+                if (!Schema::hasColumn('documents', 'version')) {
+                    $table->integer('version')->default(1)->after('mime_type');
+                }
+                if (!Schema::hasColumn('documents', 'is_public')) {
+                    $table->boolean('is_public')->default(false)->after('mime_type');
+                }
             });
         }
 

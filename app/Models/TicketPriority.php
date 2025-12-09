@@ -112,11 +112,11 @@ class TicketPriority extends Model
     // Helper methods for converting between units
     public function getResponseTimeInMinutes(): int
     {
-        return $this->response_time_minutes ?? ($this->response_time_hours * 60);
+        return $this->response_time_minutes ?? (($this->response_time_hours ?? 0) * 60);
     }
 
     public function getResolutionTimeInMinutes(): int
     {
-        return $this->resolution_time_minutes ?? ($this->resolution_time_hours * 60);
+        return $this->resolution_time_minutes ?? (($this->resolution_time_hours ?? 0) * 60);
     }
 }
