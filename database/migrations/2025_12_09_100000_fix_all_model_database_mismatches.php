@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -144,8 +145,12 @@ return new class extends Migration
             });
         }
 
-        // 9. Project Time Logs table - Add employee_id, date, is_billable, notes, updated_by
+        // 9. Project Time Logs table - Add employee_id, date, is_billable, notes, updated_by, deleted_at
         if (Schema::hasTable('project_time_logs')) {
+            $addedIsBillable = !Schema::hasColumn('project_time_logs', 'is_billable');
+            $addedEmployeeId = !Schema::hasColumn('project_time_logs', 'employee_id');
+            $addedDate = !Schema::hasColumn('project_time_logs', 'date');
+
             Schema::table('project_time_logs', function (Blueprint $table) {
                 if (!Schema::hasColumn('project_time_logs', 'employee_id')) {
                     $table->unsignedBigInteger('employee_id')->nullable()->after('user_id');
@@ -154,7 +159,7 @@ return new class extends Migration
                     $table->date('date')->nullable()->after('log_date');
                 }
                 if (!Schema::hasColumn('project_time_logs', 'is_billable')) {
-                    $table->boolean('is_billable')->default(false)->after('billable');
+                    $table->boolean('is_billable')->default(true)->after('billable');
                 }
                 if (!Schema::hasColumn('project_time_logs', 'notes')) {
                     $table->text('notes')->nullable()->after('description');
@@ -162,7 +167,31 @@ return new class extends Migration
                 if (!Schema::hasColumn('project_time_logs', 'updated_by')) {
                     $table->unsignedBigInteger('updated_by')->nullable()->after('created_by');
                 }
+                if (!Schema::hasColumn('project_time_logs', 'deleted_at')) {
+                    $table->softDeletes();
+                }
             });
+
+            // Backfill data
+            if ($addedEmployeeId) {
+                DB::table('project_time_logs')
+                    ->whereNull('employee_id')
+                    ->whereNotNull('user_id')
+                    ->update(['employee_id' => DB::raw('user_id')]);
+            }
+
+            if ($addedDate) {
+                DB::table('project_time_logs')
+                    ->whereNull('date')
+                    ->whereNotNull('log_date')
+                    ->update(['date' => DB::raw('log_date')]);
+            }
+
+            if ($addedIsBillable) {
+                DB::table('project_time_logs')->update([
+                    'is_billable' => DB::raw('COALESCE(billable, true)'),
+                ]);
+            }
         }
     }
 
@@ -318,6 +347,9 @@ return new class extends Migration
                 }
                 if (Schema::hasColumn('project_time_logs', 'updated_by')) {
                     $table->dropColumn('updated_by');
+                }
+                if (Schema::hasColumn('project_time_logs', 'deleted_at')) {
+                    $table->dropSoftDeletes();
                 }
             });
         }

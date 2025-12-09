@@ -426,12 +426,12 @@ Route::middleware('auth')->group(function () {
             ->middleware('can:rental.contracts.manage');
 
         // Properties management
-        Route::get('/properties', \App\Livewire\Rentals\Properties\Index::class)
+        Route::get('/properties', \App\Livewire\Rental\Properties\Index::class)
             ->name('properties.index')
             ->middleware('can:rentals.view');
 
         // Tenants management
-        Route::get('/tenants', \App\Livewire\Rentals\Tenants\Index::class)
+        Route::get('/tenants', \App\Livewire\Rental\Tenants\Index::class)
             ->name('tenants.index')
             ->middleware('can:rentals.view');
 
@@ -656,6 +656,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/{document}/versions', \App\Livewire\Documents\Versions::class)
             ->name('versions')
             ->middleware('can:documents.versions.view');
+        
+        Route::get('/{document}/download', [\App\Http\Controllers\Documents\DownloadController::class, '__invoke'])
+            ->name('download')
+            ->middleware('can:documents.view');
         
         // Tags
         Route::get('/settings/tags', \App\Livewire\Documents\Tags\Index::class)

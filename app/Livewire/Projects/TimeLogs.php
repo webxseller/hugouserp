@@ -18,6 +18,7 @@ class TimeLogs extends Component
 
     public Project $project;
     public ?ProjectTimeLog $editingLog = null;
+    public bool $showModal = false;
 
     // Form fields
     public ?int $task_id = null;
@@ -54,6 +55,7 @@ class TimeLogs extends Component
         $this->authorize('projects.timelogs.manage');
         $this->resetForm();
         $this->editingLog = null;
+        $this->showModal = true;
     }
 
     public function editLog(int $id): void
@@ -61,9 +63,12 @@ class TimeLogs extends Component
         $this->authorize('projects.timelogs.manage');
         $this->editingLog = ProjectTimeLog::findOrFail($id);
         $this->fill($this->editingLog->only([
-            'task_id', 'employee_id', 'date', 'hours',
+            'task_id', 'employee_id', 'hours',
             'is_billable', 'hourly_rate', 'description'
         ]));
+        $this->date = $this->editingLog->log_date?->format('Y-m-d')
+            ?? $this->editingLog->date?->format('Y-m-d');
+        $this->showModal = true;
     }
 
     public function save(): void
@@ -76,6 +81,12 @@ class TimeLogs extends Component
             'is_billable', 'hourly_rate', 'description'
         ]);
 
+        $logDate = $data['date'] ?? now()->format('Y-m-d');
+        $data['user_id'] = $data['employee_id'] ?? auth()->id();
+        $data['log_date'] = $logDate;
+        $data['date'] = $logDate;
+        $data['billable'] = $data['is_billable'];
+
         if ($this->editingLog) {
             $this->editingLog->update($data);
         } else {
@@ -85,6 +96,14 @@ class TimeLogs extends Component
         session()->flash('success', __('Time log saved successfully'));
         $this->resetForm();
         $this->editingLog = null;
+        $this->showModal = false;
+    }
+
+    public function closeModal(): void
+    {
+        $this->showModal = false;
+        $this->editingLog = null;
+        $this->resetForm();
     }
 
     public function deleteLog(int $id): void
@@ -108,16 +127,18 @@ class TimeLogs extends Component
     public function render()
     {
         $timeLogs = $this->project->timeLogs()
-            ->with(['task', 'employee'])
-            ->orderBy('date', 'desc')
+            ->with(['task', 'employee', 'user'])
+            ->orderByRaw('COALESCE(log_date, date) desc')
             ->paginate(15);
 
-        $tasks = $this->project->tasks()->orderBy('name')->get();
+        $tasks = $this->project->tasks()->orderBy('title')->get();
         $employees = User::orderBy('name')->get();
+
+        $totalHours = $this->project->timeLogs()->sum('hours');
 
         // Statistics
         $stats = [
-            'total_hours' => $this->project->timeLogs()->sum('hours'),
+            'total_hours' => $totalHours,
             'billable_hours' => $this->project->timeLogs()->billable()->sum('hours'),
             'non_billable_hours' => $this->project->timeLogs()->nonBillable()->sum('hours'),
             'total_cost' => $this->project->timeLogs()->get()->sum(fn($log) => $log->getCost()),
@@ -127,6 +148,7 @@ class TimeLogs extends Component
             'timeLogs' => $timeLogs,
             'tasks' => $tasks,
             'employees' => $employees,
+            'totalHours' => $totalHours,
             'stats' => $stats,
         ]);
     }

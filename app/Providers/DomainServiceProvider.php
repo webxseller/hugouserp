@@ -21,7 +21,7 @@ class DomainServiceProvider extends ServiceProvider
         $this->app->singleton(\App\Services\Contracts\POSServiceInterface::class, \App\Services\POSService::class);
         $this->app->singleton(\App\Services\Contracts\RentalServiceInterface::class, \App\Services\RentalService::class);
         $this->app->singleton(\App\Services\Contracts\MotorcycleServiceInterface::class, \App\Services\MotorcycleService::class);
-        $this->app->singleton(\App\Services\Contracts\SparesServiceInterface::class, \App\Services\SparesService::class);
+        $this->app->singleton(\App\Services\Contracts\SparesServiceInterface::class, \App\Services\SparePartsService::class);
         $this->app->singleton(\App\Services\Contracts\WoodServiceInterface::class, \App\Services\WoodService::class);
         $this->app->singleton(\App\Services\Contracts\HRMServiceInterface::class, \App\Services\HRMService::class);
         $this->app->singleton(\App\Services\Contracts\PricingServiceInterface::class, \App\Services\PricingService::class);

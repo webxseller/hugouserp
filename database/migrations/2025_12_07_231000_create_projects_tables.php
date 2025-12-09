@@ -93,6 +93,7 @@ return new class extends Migration
             $table->json('metadata')->nullable();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->index(['project_id', 'user_id']);
             $table->index('task_id');
