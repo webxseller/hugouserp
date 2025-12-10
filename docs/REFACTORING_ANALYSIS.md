@@ -21,12 +21,19 @@ This document provides a comprehensive analysis of the HugousERP codebase and re
 - Easier to find current, accurate documentation
 - Clearer project direction with consolidated roadmap
 
-### 2. Database Portability Improvements ✅
+### ✅ Database Portability Improvements (Complete)
 **Impact**: High  
 **Effort**: Low  
 **Status**: Complete
 
 Fixed database-specific SQL in `app/Livewire/Reports/SalesAnalytics.php`:
+
+- **Created DatabaseCompatibilityService**: Centralized service for database-portable SQL expressions
+  - Provides methods for hour, day, month, year extraction
+  - Supports date truncation (day, week, month, year)
+  - Handles case-insensitive search (ILIKE)
+  - Provides string concatenation, date arithmetic, JSON extraction
+  - Fully documented with examples
 
 - **Hour extraction** now supports:
   - PostgreSQL: `CAST(EXTRACT(HOUR FROM created_at) AS INTEGER)`
@@ -42,6 +49,8 @@ Fixed database-specific SQL in `app/Livewire/Reports/SalesAnalytics.php`:
 - Full SQLite support for testing
 - Production flexibility (PostgreSQL or MySQL 8.4+)
 - Consistent analytics across database engines
+- **Reusable service** for future database-portable queries
+- **Code duplication eliminated** - single source of truth
 
 ## Remaining Work
 
@@ -165,13 +174,27 @@ protected $fillable = [
 1. Review 71 instances of `DB::raw()`, `selectRaw()`, `whereRaw()`, etc.
 2. For each instance:
    - If using standard SQL (SUM, COUNT, CASE, COALESCE) → OK
-   - If using DB-specific functions → refactor with driver detection
+   - If using DB-specific functions → refactor with DatabaseCompatibilityService
    - If possible to use Query Builder → prefer that
 
-3. Focus on:
-   - Date/time functions (already fixed in SalesAnalytics, check others)
-   - String functions (CONCAT vs `||` vs CONCAT_WS)
-   - JSON functions (different across DBs)
+3. **Use DatabaseCompatibilityService** for:
+   - Date/time extraction: `$dbService->hourExpression()`, `->monthExpression()`, etc.
+   - Date truncation: `$dbService->monthTruncateExpression()`, `->weekTruncateExpression()`
+   - Case-insensitive search: `$dbService->ilike()`
+   - String concatenation: `$dbService->concat()`
+   - Date arithmetic: `$dbService->addDays()`, `->daysDifference()`
+   
+4. Example refactoring:
+   ```php
+   // Before: Database-specific
+   $expr = $isPostgres 
+       ? 'EXTRACT(HOUR FROM created_at)::integer' 
+       : 'HOUR(created_at)';
+   
+   // After: Using service
+   $dbService = app(DatabaseCompatibilityService::class);
+   $expr = $dbService->hourExpression('created_at');
+   ```
 
 #### 3.2 GROUP BY Strict Mode (Medium Priority)
 **Estimated Effort**: 1 day  
