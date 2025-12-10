@@ -68,7 +68,7 @@
                     </svg>
                     {{ __('Export') }}
                 </button>
-                <a href="{{ route('inventory.products.create') }}"
+                <a href="{{ route('app.inventory.products.create') }}"
                    class="erp-btn-primary text-xs px-3 py-2">
                     {{ __('Add product') }}
                 </a>
@@ -136,14 +136,14 @@
                         </td>
                         <td class="px-3 py-2 text-xs text-end">
                             <div class="flex items-center justify-end gap-1">
-                                <a href="{{ route('inventory.products.store-mappings', $product->id) }}"
+                                <a href="{{ route('app.inventory.products.store-mappings', $product->id) }}"
                                    class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-[0.7rem] font-semibold text-blue-700 hover:bg-blue-100"
                                    title="{{ __('Store Mappings') }}">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
                                     </svg>
                                 </a>
-                                <a href="{{ route('inventory.products.edit', $product->id) }}"
+                                <a href="{{ route('app.inventory.products.edit', $product->id) }}"
                                    class="inline-flex items-center rounded-md bg-emerald-50 px-2 py-1 text-[0.7rem] font-semibold text-emerald-700 hover:bg-emerald-100">
                                     {{ __('Edit') }}
                                 </a>

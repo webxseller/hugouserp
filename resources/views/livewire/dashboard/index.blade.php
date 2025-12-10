@@ -55,7 +55,7 @@
         </a>
 
         {{-- Inventory Management --}}
-        <a href="{{ route('inventory.products.index') }}" class="group flex flex-col items-center gap-3 p-5 bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-lg hover:border-green-200 transition-all duration-300">
+        <a href="{{ route('app.inventory.products.index') }}" class="group flex flex-col items-center gap-3 p-5 bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-lg hover:border-green-200 transition-all duration-300">
             <div class="w-16 h-16 flex items-center justify-center rounded-full bg-gradient-to-br from-green-100 to-green-50 group-hover:scale-110 transition-transform">
                 <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
@@ -181,7 +181,7 @@
         <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-lg font-semibold text-slate-800">{{ __('Low Stock Alerts') }}</h3>
-                <a href="{{ route('inventory.products.index') }}" class="text-sm text-emerald-600 hover:text-emerald-700">{{ __('View All') }}</a>
+                <a href="{{ route('app.inventory.products.index') }}" class="text-sm text-emerald-600 hover:text-emerald-700">{{ __('View All') }}</a>
             </div>
             @if(count($lowStockProducts) > 0)
                 <div class="space-y-3">

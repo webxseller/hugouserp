@@ -386,7 +386,7 @@
 
         {{-- Form Actions --}}
         <div class="flex justify-end gap-2 pt-4 border-t border-slate-200">
-            <a href="{{ route('inventory.products.index') }}"
+            <a href="{{ route('app.inventory.products.index') }}"
                class="inline-flex items-center rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50 transition-colors">
                 {{ __('Cancel') }}
             </a>

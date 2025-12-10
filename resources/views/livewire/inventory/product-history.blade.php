@@ -10,7 +10,7 @@
 @endsection
 
 @section('page-actions')
-    <a href="{{ route('inventory.products.index') }}" class="erp-btn-secondary">
+    <a href="{{ route('app.inventory.products.index') }}" class="erp-btn-secondary">
         <svg class="w-5 h-5 ltr:mr-1 rtl:ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
         </svg>
@@ -191,7 +191,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
             </svg>
             <p class="text-slate-500 text-lg">{{ __('Product not found') }}</p>
-            <a href="{{ route('inventory.products.index') }}" class="mt-4 inline-flex erp-btn-primary">
+            <a href="{{ route('app.inventory.products.index') }}" class="mt-4 inline-flex erp-btn-primary">
                 {{ __('Go to Products') }}
             </a>
         </div>

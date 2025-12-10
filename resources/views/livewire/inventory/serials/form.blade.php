@@ -6,7 +6,7 @@
             </h1>
             <p class="text-sm text-slate-500">{{ __('Serial number information and warranty') }}</p>
         </div>
-        <a href="{{ route('inventory.serials.index') }}" class="erp-btn erp-btn-secondary">
+        <a href="{{ route('app.inventory.serials.index') }}" class="erp-btn erp-btn-secondary">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
             </svg>
@@ -102,7 +102,7 @@
             </div>
 
             <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
-                <a href="{{ route('inventory.serials.index') }}" class="erp-btn erp-btn-secondary">{{ __('Cancel') }}</a>
+                <a href="{{ route('app.inventory.serials.index') }}" class="erp-btn erp-btn-secondary">{{ __('Cancel') }}</a>
                 <button type="submit" class="erp-btn erp-btn-primary" wire:loading.attr="disabled">
                     <span wire:loading.remove>{{ $isEditing ? __('Update Serial') : __('Create Serial') }}</span>
                     <span wire:loading>{{ __('Saving...') }}</span>

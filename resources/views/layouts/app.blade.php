@@ -2,9 +2,11 @@
 @php
     $locale = app()->getLocale();
     $dir = $locale === 'ar' ? 'rtl' : 'ltr';
+    $userTheme = auth()->check() ? (auth()->user()->preferences->theme ?? 'light') : 'light';
+    $isDark = $userTheme === 'dark' || ($userTheme === 'system' && request()->cookie('theme') === 'dark');
 @endphp
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', $locale) }}" dir="{{ $dir }}" class="h-full antialiased">
+<html lang="{{ str_replace('_', '-', $locale) }}" dir="{{ $dir }}" class="h-full antialiased {{ $isDark ? 'dark' : '' }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -24,6 +26,14 @@
     </style>
 
     <script>
+        // Theme initialization
+        (function() {
+            const theme = localStorage.getItem('theme') || '{{ $userTheme }}';
+            if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            }
+        })();
+        
         window.Laravel = {
             @if(auth()->check())
                 userId: {{ auth()->id() }},
@@ -137,6 +147,30 @@
 
 @livewireScripts
 @stack('scripts')
+
+<script>
+    // Handle theme changes from UserPreferences
+    document.addEventListener('livewire:initialized', () => {
+        Livewire.on('theme-changed', (event) => {
+            const theme = event.theme || event[0]?.theme || event[0];
+            if (theme) {
+                localStorage.setItem('theme', theme);
+                
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                } else if (theme === 'light') {
+                    document.documentElement.classList.remove('dark');
+                } else if (theme === 'system') {
+                    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                        document.documentElement.classList.add('dark');
+                    } else {
+                        document.documentElement.classList.remove('dark');
+                    }
+                }
+            }
+        });
+    });
+</script>
 
     <div id="erp-toast-root" class="fixed inset-0 pointer-events-none flex flex-col items-end justify-start px-4 py-6 space-y-2 z-[9999]"></div>
     

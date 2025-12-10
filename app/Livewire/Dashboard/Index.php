@@ -45,6 +45,9 @@ class Index extends Component
 
         $this->branchId = $user->branch_id;
         $this->isAdmin = $user->hasRole('super-admin') || $user->hasRole('admin');
+        
+        // Load cache TTL from system settings
+        $this->cacheTtl = (int) (\App\Models\SystemSetting::where('key', 'advanced.cache_ttl')->value('value') ?? 300);
 
         $this->loadStats();
         $this->loadChartData();
@@ -160,7 +163,7 @@ class Index extends Component
                 ->get();
 
             $paymentMethodsData = [
-                'labels' => $paymentMethodsRaw->pluck('method')->map(fn ($m) => ucfirst($m ?? 'cash'))->toArray(),
+                'labels' => $paymentMethodsRaw->pluck('payment_method')->map(fn ($m) => ucfirst($m ?? 'cash'))->toArray(),
                 'data' => $paymentMethodsRaw->pluck('count')->toArray(),
                 'totals' => $paymentMethodsRaw->pluck('total')->toArray(),
             ];

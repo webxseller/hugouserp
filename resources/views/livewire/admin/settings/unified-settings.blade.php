@@ -101,8 +101,15 @@
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                 {{ __('Default Currency') }}
                             </label>
-                            <input type="text" wire:model="default_currency" maxlength="3"
+                            <select wire:model="default_currency"
                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                <option value="">{{ __('Select Currency') }}</option>
+                                @foreach($currencies as $currency)
+                                    <option value="{{ $currency->code }}">
+                                        {{ $currency->code }} - {{ $currency->name }} ({{ $currency->symbol }})
+                                    </option>
+                                @endforeach
+                            </select>
                             @error('default_currency') <span class="text-sm text-red-600">{{ $message }}</span> @enderror
                         </div>
 

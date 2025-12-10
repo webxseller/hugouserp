@@ -4,7 +4,7 @@
             <h1 class="text-2xl font-bold text-slate-800">{{ $editMode ? __('Edit Purchase') : __('New Purchase') }}</h1>
             <p class="text-sm text-slate-500">{{ __('Create purchase order from supplier') }}</p>
         </div>
-        <a href="{{ route('purchases.index') }}" class="erp-btn erp-btn-secondary">{{ __('Back') }}</a>
+        <a href="{{ route('app.purchases.index') }}" class="erp-btn erp-btn-secondary">{{ __('Back') }}</a>
     </div>
 
     <form wire:submit="save" class="space-y-6">
@@ -62,10 +62,9 @@
                 <div>
                     <label class="erp-label">{{ __('Currency') }}</label>
                     <select wire:model="currency" class="erp-input">
-                        <option value="EGP">EGP</option>
-                        <option value="USD">USD</option>
-                        <option value="EUR">EUR</option>
-                        <option value="SAR">SAR</option>
+                        @foreach($currencies as $curr)
+                            <option value="{{ $curr->code }}">{{ $curr->code }} - {{ $curr->name }} ({{ $curr->symbol }})</option>
+                        @endforeach
                     </select>
                 </div>
 
@@ -204,7 +203,7 @@
         </div>
 
         <div class="flex justify-end gap-3">
-            <a href="{{ route('purchases.index') }}" class="erp-btn erp-btn-secondary">{{ __('Cancel') }}</a>
+            <a href="{{ route('app.purchases.index') }}" class="erp-btn erp-btn-secondary">{{ __('Cancel') }}</a>
             <button type="submit" class="erp-btn erp-btn-primary">{{ $editMode ? __('Update Purchase') : __('Create Purchase') }}</button>
         </div>
     </form>
