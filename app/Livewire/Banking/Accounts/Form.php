@@ -51,14 +51,22 @@ class Form extends Component
 
     public function mount(?BankAccount $account = null): void
     {
-        // Load currencies
-        $this->currencies = Currency::query()
+        // Load currencies with code => name mapping for better UX
+        $currencyList = Currency::query()
             ->where('is_active', true)
-            ->pluck('code', 'code')
-            ->toArray();
-
-        if (empty($this->currencies)) {
-            $this->currencies = ['USD' => 'USD', 'EUR' => 'EUR', 'GBP' => 'GBP'];
+            ->get(['code', 'name']);
+        
+        if ($currencyList->isNotEmpty()) {
+            $this->currencies = $currencyList->mapWithKeys(function ($currency) {
+                return [$currency->code => $currency->name . ' (' . $currency->code . ')'];
+            })->toArray();
+        } else {
+            // Fallback currencies if none configured
+            $this->currencies = [
+                'USD' => 'US Dollar (USD)',
+                'EUR' => 'Euro (EUR)',
+                'GBP' => 'British Pound (GBP)',
+            ];
         }
 
         if ($account && $account->exists) {
@@ -73,8 +81,15 @@ class Form extends Component
             
             // Set default currency if available
             $defaultCurrency = \App\Models\SystemSetting::where('key', 'default_currency')->value('value');
+            // Handle JSON-casted value or string value
+            if (is_array($defaultCurrency)) {
+                $defaultCurrency = $defaultCurrency['value'] ?? null;
+            }
             if ($defaultCurrency && isset($this->currencies[$defaultCurrency])) {
                 $this->currency = $defaultCurrency;
+            } elseif (!empty($this->currencies)) {
+                // Default to first available currency
+                $this->currency = array_key_first($this->currencies);
             }
         }
     }
