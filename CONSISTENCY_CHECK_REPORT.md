@@ -451,6 +451,17 @@ Modules can extend the base product with:
    - **Changes:** Updated 8 route references from old pattern to `app.*`
    - **Status:** ✅ **FIXED**
 
+2. **❌ → ✅ Inconsistent Rental Module Key in PreConfiguredModulesSeeder**
+   - **Files Changed:** `database/seeders/PreConfiguredModulesSeeder.php`
+   - **Issue:** Rental module was using 'rentals' (plural) key instead of canonical 'rental' (singular)
+   - **Changes:** 
+     - Updated module key from 'rentals' to 'rental'
+     - Updated module slug from 'rentals' to 'rental'
+     - Updated module name from 'Rentals' to 'Rental'
+     - Updated report identifier from 'rentals' to 'rental'
+   - **Reason:** Aligns with ModulesSeeder.php and ModuleNavigationSeeder.php which use 'rental'
+   - **Status:** ✅ **FIXED**
+
 ### No Issues Found
 
 - ✅ No duplicate module definitions

@@ -150,10 +150,10 @@ class PreConfiguredModulesSeeder extends Seeder
     protected function createRentalsModule(): void
     {
         $module = Module::updateOrCreate(
-            ['key' => 'rentals'],
+            ['key' => 'rental'],
             [
-                'slug' => 'rentals',
-                'name' => 'Rentals',
+                'slug' => 'rental',
+                'name' => 'Rental',
                 'name_ar' => 'الإيجارات',
                 'description' => 'Property and equipment rental management',
                 'description_ar' => 'إدارة تأجير العقارات والمعدات',
@@ -289,7 +289,7 @@ class PreConfiguredModulesSeeder extends Seeder
             );
         }
 
-        $this->createModuleReports($module, 'rentals');
+        $this->createModuleReports($module, 'rental');
     }
 
     protected function createSparePartsModule(): void
