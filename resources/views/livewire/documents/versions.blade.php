@@ -60,6 +60,6 @@
     </div>
 
     <div class="flex items-center justify-start">
-        <a href="{{ route('documents.show', $document->id) }}" class="erp-btn erp-btn-secondary">{{ __('Back to Document') }}</a>
+        <a href="{{ route('app.documents.show', $document->id) }}" class="erp-btn erp-btn-secondary">{{ __('Back to Document') }}</a>
     </div>
 </div>

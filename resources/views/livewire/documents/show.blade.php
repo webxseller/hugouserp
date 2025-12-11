@@ -51,7 +51,7 @@
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="font-semibold text-slate-800">{{ __('Version History') }}</h3>
                     @can('documents.versions.manage')
-                        <a href="{{ route('documents.versions', $document->id) }}" class="text-sm text-blue-600 hover:text-blue-900">{{ __('Manage Versions') }}</a>
+                        <a href="{{ route('app.documents.versions', $document->id) }}" class="text-sm text-blue-600 hover:text-blue-900">{{ __('Manage Versions') }}</a>
                     @endcan
                 </div>
                 <div class="space-y-3">

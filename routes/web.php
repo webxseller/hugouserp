@@ -567,9 +567,17 @@ Route::middleware('auth')->group(function () {
             ->name('create')
             ->middleware('can:documents.manage');
 
+        Route::get('/{document}', \App\Livewire\Documents\Show::class)
+            ->name('show')
+            ->middleware('can:documents.view');
+
         Route::get('/{document}/edit', \App\Livewire\Documents\Form::class)
             ->name('edit')
             ->middleware('can:documents.manage');
+
+        Route::get('/{document}/versions', \App\Livewire\Documents\Versions::class)
+            ->name('versions')
+            ->middleware('can:documents.view');
     });
 
     // HELPDESK MODULE

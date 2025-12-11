@@ -114,7 +114,7 @@ class Form extends Component
             session()->flash('success', __('Fixed asset created successfully'));
         }
 
-        $this->redirect(route('fixed-assets.index'));
+        $this->redirect(route('app.fixed-assets.index'));
     }
 
     #[Layout('layouts.app')]

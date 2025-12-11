@@ -136,7 +136,7 @@ class TicketForm extends Component
             session()->flash('success', __('Ticket created successfully'));
         }
 
-        return redirect()->route('helpdesk.show', $this->ticket->id);
+        return redirect()->route('app.helpdesk.tickets.show', $this->ticket->id);
     }
 
     public function render()

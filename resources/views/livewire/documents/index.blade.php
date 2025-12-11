@@ -87,7 +87,7 @@
     <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
         @forelse($documents as $doc)
             <div class="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition-shadow">
-                <a href="{{ route('documents.show', $doc->id) }}" class="block">
+                <a href="{{ route('app.documents.show', $doc->id) }}" class="block">
                     <div class="flex items-center justify-center h-32 bg-slate-100 rounded-lg mb-3">
                         @if(str_contains($doc->mime_type, 'image'))
                             <img src="{{ Storage::url($doc->file_path) }}" alt="{{ $doc->title }}" class="h-full w-full object-cover rounded-lg">
@@ -107,7 +107,7 @@
                     <p class="text-xs text-slate-400">{{ $doc->uploader->name }} • {{ $doc->created_at->diffForHumans() }}</p>
                 </a>
                 <div class="flex items-center gap-2 mt-3 pt-3 border-t">
-                    <a href="{{ route('documents.show', $doc->id) }}" class="text-xs text-blue-600 hover:text-blue-900">{{ __('View') }}</a>
+                    <a href="{{ route('app.documents.show', $doc->id) }}" class="text-xs text-blue-600 hover:text-blue-900">{{ __('View') }}</a>
                     @can('documents.edit')
                         @if($doc->uploaded_by === auth()->id())
                             <a href="{{ route('app.documents.edit', $doc->id) }}" class="text-xs text-emerald-600 hover:text-emerald-900">{{ __('Edit') }}</a>

@@ -83,7 +83,7 @@ class Form extends Component
             session()->flash('success', __('Project created successfully'));
         }
 
-        $this->redirect(route('projects.index'));
+        $this->redirect(route('app.projects.index'));
     }
 
     public function render()

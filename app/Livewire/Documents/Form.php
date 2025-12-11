@@ -104,7 +104,7 @@ class Form extends Component
             session()->flash('success', __('Document uploaded successfully'));
         }
 
-        return redirect()->route('documents.show', $this->document->id);
+        return redirect()->route('app.documents.show', $this->document->id);
     }
 
     public function render()

@@ -154,7 +154,7 @@
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
-                            <a href="{{ route('projects.show', $project->id) }}" class="text-emerald-600 hover:text-emerald-900">
+                            <a href="{{ route('app.projects.show', $project->id) }}" class="text-emerald-600 hover:text-emerald-900">
                                 {{ __('View') }}
                             </a>
                             @can('projects.edit')
