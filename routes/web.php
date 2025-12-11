@@ -463,9 +463,10 @@ Route::middleware('auth')->group(function () {
             ->middleware('can:hrm.payroll.run');
 
         // Shifts
-        Route::get('/shifts', \App\Livewire\Hrm\Shifts\Index::class)
-            ->name('shifts.index')
-            ->middleware('can:hrm.view');
+        // TODO: Implement Shifts component
+        // Route::get('/shifts', \App\Livewire\Hrm\Shifts\Index::class)
+        //     ->name('shifts.index')
+        //     ->middleware('can:hrm.view');
 
         // Reports
         Route::get('/reports', HrmReportsDashboard::class)
@@ -506,9 +507,10 @@ Route::middleware('auth')->group(function () {
             ->name('edit')
             ->middleware('can:fixed-assets.manage');
 
-        Route::get('/depreciation', \App\Livewire\FixedAssets\Depreciation::class)
-            ->name('depreciation')
-            ->middleware('can:fixed-assets.view');
+        // TODO: Implement FixedAssets\Depreciation component
+        // Route::get('/depreciation', \App\Livewire\FixedAssets\Depreciation::class)
+        //     ->name('depreciation')
+        //     ->middleware('can:fixed-assets.view');
     });
 
     // PROJECTS MODULE
@@ -561,17 +563,18 @@ Route::middleware('auth')->group(function () {
             ->name('index')
             ->middleware('can:helpdesk.view');
 
-        Route::get('/tickets', \App\Livewire\Helpdesk\Tickets\Index::class)
-            ->name('tickets.index')
-            ->middleware('can:helpdesk.view');
+        // TODO: Implement Helpdesk\Tickets components
+        // Route::get('/tickets', \App\Livewire\Helpdesk\Tickets\Index::class)
+        //     ->name('tickets.index')
+        //     ->middleware('can:helpdesk.view');
 
-        Route::get('/tickets/create', \App\Livewire\Helpdesk\Tickets\Form::class)
-            ->name('tickets.create')
-            ->middleware('can:helpdesk.manage');
+        // Route::get('/tickets/create', \App\Livewire\Helpdesk\Tickets\Form::class)
+        //     ->name('tickets.create')
+        //     ->middleware('can:helpdesk.manage');
 
-        Route::get('/tickets/{ticket}', \App\Livewire\Helpdesk\Tickets\Show::class)
-            ->name('tickets.show')
-            ->middleware('can:helpdesk.view');
+        // Route::get('/tickets/{ticket}', \App\Livewire\Helpdesk\Tickets\Show::class)
+        //     ->name('tickets.show')
+        //     ->middleware('can:helpdesk.view');
 
         Route::get('/categories', \App\Livewire\Helpdesk\Categories\Index::class)
             ->name('categories.index')
