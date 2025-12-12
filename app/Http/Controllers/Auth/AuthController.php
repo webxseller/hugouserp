@@ -22,7 +22,9 @@ class AuthController extends Controller
             return $this->fail(__('Invalid credentials'), 422);
         }
 
-        if (property_exists($user, 'is_active') && ! $user->is_active) {
+        $hasIsActiveAttribute = array_key_exists('is_active', $user->getAttributes());
+
+        if ($hasIsActiveAttribute && ! (bool) $user->is_active) {
             return $this->fail(__('User disabled'), 403);
         }
 

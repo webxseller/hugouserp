@@ -58,8 +58,10 @@ class InventoryService implements InventoryServiceInterface
 
     public function adjust(int $productId, float $qty, ?int $warehouseId = null, ?string $note = null): StockMovement
     {
+        $direction = $qty > 0 ? 'in' : 'out';
+
         return $this->handleServiceOperation(
-            callback: function () use ($productId, $qty, $warehouseId, $note) {
+            callback: function () use ($productId, $qty, $warehouseId, $note, $direction) {
                 $branchId = $this->currentBranchId();
 
                 if ($branchId === null) {
@@ -75,8 +77,6 @@ class InventoryService implements InventoryServiceInterface
                 if (abs($qty) < 1e-9) {
                     throw new InvalidQuantityException('Qty cannot be zero.', 422);
                 }
-
-                $direction = $qty > 0 ? 'in' : 'out';
 
                 $data = [
                     'product_id' => $productId,
@@ -134,7 +134,7 @@ class InventoryService implements InventoryServiceInterface
                 'warehouse_id' => $warehouseId,
                 'qty' => $qty,
                 'direction' => $direction,
-                'reason' => $reason,
+                'reason' => $note,
             ]
         );
     }

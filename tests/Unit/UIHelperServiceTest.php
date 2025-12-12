@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit;
 
 use App\Services\UIHelperService;
+use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 
 class UIHelperServiceTest extends TestCase
@@ -24,6 +25,7 @@ class UIHelperServiceTest extends TestCase
         $this->assertEquals('AB', $this->service->getInitials('Alice Bob'));
         $this->assertEquals('J', $this->service->getInitials('John', 1));
         $this->assertEquals('JDS', $this->service->getInitials('John Doe Smith', 3));
+        $this->assertEquals('ÁN', $this->service->getInitials('Álvaro Núñez'));
     }
 
     /** @test */
@@ -72,6 +74,20 @@ class UIHelperServiceTest extends TestCase
             $this->service->getAvatarColor('John Doe'),
             $this->service->getAvatarColor('John Doe')
         );
+    }
+
+    /** @test */
+    public function it_gracefully_handles_missing_routes_when_building_breadcrumbs(): void
+    {
+        // Register a single known route to ensure routing is available
+        Route::get('/existing', fn () => 'ok')->name('existing');
+
+        $breadcrumbs = $this->service->generateBreadcrumbs('missing.segment.index');
+
+        $this->assertCount(3, $breadcrumbs);
+        $this->assertNull($breadcrumbs[0]['url']);
+        $this->assertNull($breadcrumbs[1]['url']);
+        $this->assertNull($breadcrumbs[2]['url']);
     }
 
     /** @test */

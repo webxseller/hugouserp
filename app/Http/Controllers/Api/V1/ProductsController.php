@@ -39,7 +39,7 @@ class ProductsController extends BaseApiController
                     ->orWhere('sku', 'like', '%'.$query.'%')
                     ->orWhere('barcode', 'like', '%'.$query.'%');
             })
-            ->where('status', 'active')
+            ->when(! $request->filled('status'), fn ($q) => $q->where('status', 'active'))
             ->when($request->filled('status'), fn ($q) => $q->where('status', $request->status))
             ->when($request->filled('category_id'), fn ($q) => $q->where('category_id', $request->category_id))
             ->select('id', 'name', 'sku', 'default_price', 'barcode', 'category_id', 'tax_id');

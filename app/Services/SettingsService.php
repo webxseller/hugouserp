@@ -9,6 +9,7 @@ use App\Traits\HandlesServiceErrors;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class SettingsService
 {
@@ -126,8 +127,31 @@ class SettingsService
         return $this->handleServiceOperation(
             callback: function () {
                 return Cache::remember(self::CACHE_KEY, self::CACHE_TTL, function () {
-                    return SystemSetting::pluck('value', 'key')
-                        ->map(fn ($v) => is_array($v) ? ($v[0] ?? $v) : $v)
+                    return SystemSetting::select('key', 'value', 'is_encrypted')
+                        ->get()
+                        ->mapWithKeys(function (SystemSetting $setting): array {
+                            $value = is_array($setting->value) ? ($setting->value[0] ?? $setting->value) : $setting->value;
+
+                            if ($setting->is_encrypted && $value) {
+                                try {
+                                    $decrypted = Crypt::decryptString($value);
+                                    $decoded = json_decode($decrypted, true);
+
+                                    return [
+                                        $setting->key => json_last_error() === JSON_ERROR_NONE ? $decoded : $decrypted,
+                                    ];
+                                } catch (Throwable $e) {
+                                    Log::warning('Failed to decrypt cached setting', [
+                                        'key' => $setting->key,
+                                        'error' => $e->getMessage(),
+                                    ]);
+
+                                    return [$setting->key => null];
+                                }
+                            }
+
+                            return [$setting->key => $value];
+                        })
                         ->toArray();
                 });
             },

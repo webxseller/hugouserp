@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
 /**
@@ -40,7 +41,9 @@ class UIHelperService
 
             $breadcrumbs[] = [
                 'label' => __($label),
-                'url' => $index === count($parts) - 1 ? null : route($accumulated, $parameters),
+                'url' => $index === count($parts) - 1
+                    ? null
+                    : (Route::has($accumulated) ? route($accumulated, $parameters) : null),
                 'active' => $index === count($parts) - 1,
             ];
         }
@@ -101,13 +104,13 @@ class UIHelperService
         $initials = '';
 
         foreach ($words as $word) {
-            if (strlen($initials) >= $length) {
+            if (mb_strlen($initials) >= $length) {
                 break;
             }
             $initials .= mb_substr($word, 0, 1);
         }
 
-        return strtoupper($initials);
+        return mb_strtoupper($initials);
     }
 
     /**
