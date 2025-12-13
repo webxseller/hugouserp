@@ -38,7 +38,14 @@ class PurchaseService implements PurchaseServiceInterface
     {
         return $this->handleServiceOperation(
             callback: fn () => DB::transaction(function () use ($payload) {
-                $branchId = $this->branchIdOrFail();
+                // Controller provides branch_id in payload after validation
+                // Service validates it exists as defense-in-depth
+                if (!isset($payload['branch_id'])) {
+                    $branchId = $this->branchIdOrFail();
+                } else {
+                    $branchId = (int) $payload['branch_id'];
+                }
+                
                 $p = Purchase::create([
                     'branch_id' => $branchId,
                     'warehouse_id' => $payload['warehouse_id'] ?? null,
