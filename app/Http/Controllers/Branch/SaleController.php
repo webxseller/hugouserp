@@ -24,11 +24,6 @@ class SaleController extends Controller
         return (int) $branchId;
     }
 
-    protected function assertBranch(Sale $sale, int $branchId): void
-    {
-        abort_if($sale->branch_id !== $branchId, 404);
-    }
-
     public function index(Request $request)
     {
         $per = min(max($request->integer('per_page', 20), 1), 100);
@@ -48,14 +43,13 @@ class SaleController extends Controller
 
     public function show(Request $request, Sale $sale)
     {
-        $this->assertBranch($sale, $this->requireBranchId($request));
-
+        // Note: scopeBindings() in routes ensures Sale belongs to branch
         return $this->ok($sale->load('items'));
     }
 
     public function update(Request $request, Sale $sale)
     {
-        $this->assertBranch($sale, $this->requireBranchId($request));
+        // Note: scopeBindings() in routes ensures Sale belongs to branch
         $sale->fill($request->only(['notes']))->save();
 
         return $this->ok($sale);

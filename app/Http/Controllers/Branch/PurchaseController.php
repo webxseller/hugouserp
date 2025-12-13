@@ -29,11 +29,6 @@ class PurchaseController extends Controller
         return (int) $branchId;
     }
 
-    protected function assertBranch(Purchase $purchase, int $branchId): void
-    {
-        abort_if($purchase->branch_id !== $branchId, 404);
-    }
-
     public function index(Request $request)
     {
         $per = min(max($request->integer('per_page', 20), 1), 100);
@@ -58,14 +53,13 @@ class PurchaseController extends Controller
 
     public function show(Request $request, Purchase $purchase)
     {
-        $this->assertBranch($purchase, $this->requireBranchId($request));
-
+        // Note: scopeBindings() in routes ensures Purchase belongs to branch
         return $this->ok($purchase->load('items'));
     }
 
     public function update(PurchaseUpdateRequest $request, Purchase $purchase)
     {
-        $this->assertBranch($purchase, $this->requireBranchId($request));
+        // Note: scopeBindings() in routes ensures Purchase belongs to branch
         $purchase->fill($request->validated())->save();
 
         return $this->ok($purchase);

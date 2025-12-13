@@ -40,7 +40,7 @@ class PurchaseService implements PurchaseServiceInterface
             callback: fn () => DB::transaction(function () use ($payload) {
                 $branchId = $this->branchIdOrFail();
                 $p = Purchase::create([
-                    'branch_id' => $payload['branch_id'] ?? $branchId,
+                    'branch_id' => $branchId,
                     'warehouse_id' => $payload['warehouse_id'] ?? null,
                     'supplier_id' => $payload['supplier_id'] ?? null,
                     'status' => 'draft',
