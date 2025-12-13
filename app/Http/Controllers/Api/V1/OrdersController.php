@@ -144,7 +144,8 @@ class OrdersController extends BaseApiController
                         throw new \Exception(__('Product not available for this branch').': '.($item['product_id'] ?? $item['external_id']));
                     }
 
-                    $lineSubtotal = (float) $item['price'] * (int) $item['quantity'];
+                    // Support fractional quantities (e.g., 0.5 kg, 2.75 meters)
+                    $lineSubtotal = (float) $item['price'] * (float) $item['quantity'];
                     $lineDiscount = max(0, (float) ($item['discount'] ?? 0));
                     $lineDiscount = min($lineDiscount, $lineSubtotal);
 
